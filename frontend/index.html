@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>Market Storage</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 20px auto; padding: 0 20px; }
+        input, button { padding: 8px; margin: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #333; color: white; }
+        .section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Market Storage</h1>
+
+    <div class="section">
+        <h3>Lisää tuote</h3>
+        <input type="text" id="nimi" placeholder="Nimi">
+        <input type="number" id="hinta" placeholder="Hinta" step="0.01">
+        <input type="number" id="maara" placeholder="Määrä">
+        <button onclick="addProduct()">Lisää</button>
+    </div>
+
+    <div class="section">
+        <h3>Hae tuotetta</h3>
+        <input type="text" id="search" placeholder="Hae nimellä...">
+        <button onclick="searchByName()">Hae</button>
+        <button onclick="loadProducts()">Näytä kaikki</button>
+    </div>
+
+    <table>
+        <thead><tr><th>ID</th><th>Nimi</th><th>Hinta</th><th>Määrä</th><th></th></tr></thead>
+        <tbody id="products"></tbody>
+    </table>
+
+    <script>
+        const API = 'http://localhost:5000/api';
+
+        async function loadProducts() {
+            const res = await fetch(`${API}/products`);
+            const data = await res.json();
+            showProducts(data);
+        }
+
+        function showProducts(products) {
+            document.getElementById('products').innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.nimi}</td>
+                    <td>${p.hinta}</td>
+                    <td>${p.maara}</td>
+                    <td><button onclick="deleteProduct(${p.id})">Poista</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function addProduct() {
+            await fetch(`${API}/products`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nimi: document.getElementById('nimi').value,
+                    hinta: parseFloat(document.getElementById('hinta').value),
+                    maara: parseInt(document.getElementById('maara').value)
+                })
+            });
+            loadProducts();
+        }
+
+        async function deleteProduct(id) {
+            await fetch(`${API}/products/${id}`, {method: 'DELETE'});
+            loadProducts();
+        }
+
+        async function searchByName() {
+            const res = await fetch(`${API}/products/search/name/${document.getElementById('search').value}`);
+            showProducts(await res.json());
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>
