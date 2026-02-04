@@ -2,83 +2,673 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Market Storage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Citymarket Järvenpää</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial; max-width: 800px; margin: 20px auto; padding: 0 20px; }
-        input, button { padding: 8px; margin: 5px 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #333; color: white; }
-        .section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #242424;
+            --bg-hover: #2a2a2a;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #333;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card h2 .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Form */
+        .form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        /* Buttons */
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Search bar */
+        .search-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-row input {
+            flex: 1;
+        }
+
+        /* Products list */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .product-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px 100px 80px;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .product-row:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .product-id {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .product-name {
+            font-weight: 500;
+        }
+
+        .product-price {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .product-amount {
+            color: var(--text-secondary);
+        }
+
+        .product-actions {
+            text-align: right;
+        }
+
+        /* Column headers */
+        .list-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px 100px 80px;
+            padding: 0 20px 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 420px;
+            width: 90%;
+            z-index: 101;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .modal h3 {
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal strong {
+            color: var(--text-primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-cancel {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-cancel:hover {
+            background: var(--bg-hover);
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .product-row, .list-header {
+                grid-template-columns: 50px 1fr 80px 60px;
+            }
+            .product-actions {
+                display: none;
+            }
+            .product-row {
+                position: relative;
+            }
+            .product-row::after {
+                content: 'Swipe to delete';
+                display: none;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 200;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
-    <h1>Market Storage</h1>
+    <div class="container">
+        <header>
+            <h1>K-Citymarket Järvenpää</h1>
+            <p>Hallitse varastoa helposti</p>
+        </header>
 
-    <div class="section">
-        <h3>Lisää tuote</h3>
-        <input type="text" id="nimi" placeholder="Nimi">
-        <input type="number" id="hinta" placeholder="Hinta" step="0.01">
-        <input type="number" id="maara" placeholder="Määrä">
-        <button onclick="addProduct()">Lisää</button>
+        <!-- Add Product -->
+        <div class="card">
+            <h2><span class="icon">➕</span> Lisää tuote</h2>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Nimi</label>
+                    <input type="text" id="nimi" placeholder="Tuotteen nimi">
+                </div>
+                <div class="input-group">
+                    <label>Hinta (€)</label>
+                    <input type="number" id="hinta" placeholder="0.00" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Määrä</label>
+                    <input type="number" id="maara" placeholder="0">
+                </div>
+                <div class="input-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn-primary" onclick="checkAndAddProduct()">Lisää</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="card">
+            <h2><span class="icon">🔍</span> Hae tuotteita</h2>
+            <div class="search-row">
+                <input type="text" id="search" placeholder="Kirjoita tuotteen nimi..." onkeyup="handleSearch(event)">
+                <button class="btn-secondary" onclick="loadProducts()">Näytä kaikki</button>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="card">
+            <div class="products-header">
+                <h2><span class="icon">📋</span> Tuotteet</h2>
+                <span class="product-count" id="productCount">0 tuotetta</span>
+            </div>
+
+            <div class="list-header">
+                <span>ID</span>
+                <span>Nimi</span>
+                <span>Hinta</span>
+                <span>Määrä</span>
+                <span></span>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="products-list" id="products"></div>
+        </div>
     </div>
 
-    <div class="section">
-        <h3>Hae tuotetta</h3>
-        <input type="text" id="search" placeholder="Hae nimellä...">
-        <button onclick="searchByName()">Hae</button>
-        <button onclick="loadProducts()">Näytä kaikki</button>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="modal" id="modal" style="display: none;">
+        <h3>⚠️ Tuote on jo olemassa</h3>
+        <p id="modalText"></p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeModal()">Peruuta</button>
+            <button class="btn-success" onclick="addToExisting()">Lisää määrään</button>
+        </div>
     </div>
 
-    <table>
-        <thead><tr><th>ID</th><th>Nimi</th><th>Hinta</th><th>Määrä</th><th></th></tr></thead>
-        <tbody id="products"></tbody>
-    </table>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
     <script>
         const API = 'http://localhost:5000/api';
+        let pendingProduct = null;
+        let productsCache = [];
 
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        // Loading state
+        function setLoading(loading) {
+            document.getElementById('loading').style.display = loading ? 'block' : 'none';
+            document.getElementById('products').style.display = loading ? 'none' : 'flex';
+        }
+
+        // Load all products
         async function loadProducts() {
-            const res = await fetch(`${API}/products`);
-            const data = await res.json();
-            showProducts(data);
+            setLoading(true);
+            try {
+                const res = await fetch(`${API}/products`);
+                productsCache = await res.json();
+                renderProducts(productsCache);
+            } catch (err) {
+                showToast('Virhe ladattaessa tuotteita', 'error');
+            }
+            setLoading(false);
         }
 
-        function showProducts(products) {
-            document.getElementById('products').innerHTML = products.map(p => `
-                <tr>
-                    <td>${p.id}</td>
-                    <td>${p.nimi}</td>
-                    <td>${p.hinta}</td>
-                    <td>${p.maara}</td>
-                    <td><button onclick="deleteProduct(${p.id})">Poista</button></td>
-                </tr>
-            `).join('');
+        // Render products
+        function renderProducts(products) {
+    const container = document.getElementById('products');
+    document.getElementById('productCount').textContent = `${products.length} tuotetta`;
+
+    if (products.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">📭</div>
+                <p>Ei tuotteita</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = products.map((p, i) => `
+        <div class="product-row" style="animation-delay: ${i * 0.05}s">
+            <span class="product-id">#${p.id}</span>
+            <span class="product-name">${p.nimi}</span>
+            <span class="product-price">${parseFloat(p.hinta).toFixed(2)} €</span>
+            <span class="product-amount">${p.maara} kpl</span>
+            <div class="product-actions">
+                <button class="btn-danger" onclick="deleteProduct(${p.id})">Poista</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+        // Search with debounce
+        let searchTimeout;
+        function handleSearch(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = event.target.value.toLowerCase();
+                if (query === '') {
+                    renderProducts(productsCache);
+                } else {
+                    const filtered = productsCache.filter(p =>
+                        p.nimi.toLowerCase().includes(query)
+                    );
+                    renderProducts(filtered);
+                }
+            }, 200);
         }
 
-        async function addProduct() {
+        // Check and add product
+        async function checkAndAddProduct() {
+            const nimi = document.getElementById('nimi').value.trim().toLowerCase();
+            const hinta = parseFloat(document.getElementById('hinta').value);
+            const maara = parseInt(document.getElementById('maara').value);
+
+            if (!nimi || isNaN(hinta) || isNaN(maara)) {
+                showToast('Täytä kaikki kentät!', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/products/check/${encodeURIComponent(nimi)}`);
+                const data = await res.json();
+
+                if (data.exists) {
+                    pendingProduct = { existing: data.product, newAmount: maara };
+                    document.getElementById('modalText').innerHTML = `
+                        <strong>${data.product.nimi}</strong> löytyy jo varastosta.<br><br>
+                        Nykyinen määrä: <strong>${data.product.maara} kpl</strong><br>
+                        Lisättävä määrä: <strong>${maara} kpl</strong><br>
+                        Uusi määrä: <strong>${data.product.maara + maara} kpl</strong>
+                    `;
+                    document.getElementById('modalOverlay').style.display = 'block';
+                    document.getElementById('modal').style.display = 'block';
+                } else {
+                    await addNewProduct(nimi, hinta, maara);
+                }
+            } catch (err) {
+                showToast('Virhe lisättäessä tuotetta', 'error');
+            }
+        }
+
+        // Add new product
+        async function addNewProduct(nimi, hinta, maara) {
             await fetch(`${API}/products`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    nimi: document.getElementById('nimi').value,
-                    hinta: parseFloat(document.getElementById('hinta').value),
-                    maara: parseInt(document.getElementById('maara').value)
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nimi, hinta, maara })
             });
+            clearForm();
             loadProducts();
+            showToast('Tuote lisätty!');
         }
 
+        // Add to existing product
+        async function addToExisting() {
+            if (pendingProduct) {
+                await fetch(`${API}/products/${pendingProduct.existing.id}/add-quantity`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: pendingProduct.newAmount })
+                });
+                closeModal();
+                clearForm();
+                loadProducts();
+                showToast('Määrä lisätty!');
+            }
+        }
+
+        // Delete product
         async function deleteProduct(id) {
-            await fetch(`${API}/products/${id}`, {method: 'DELETE'});
+            await fetch(`${API}/products/${id}`, { method: 'DELETE' });
             loadProducts();
+            showToast('Tuote poistettu!');
         }
 
-        async function searchByName() {
-            const res = await fetch(`${API}/products/search/name/${document.getElementById('search').value}`);
-            showProducts(await res.json());
+        // Close modal
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('modal').style.display = 'none';
+            pendingProduct = null;
         }
 
+        // Clear form
+        function clearForm() {
+            document.getElementById('nimi').value = '';
+            document.getElementById('hinta').value = '';
+            document.getElementById('maara').value = '';
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Init
         loadProducts();
     </script>
 </body>
